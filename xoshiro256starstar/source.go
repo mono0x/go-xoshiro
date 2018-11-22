@@ -1,12 +1,12 @@
 package xoshiro256starstar
 
-import "github.com/mono0x/go-xoshiro/splitmix64"
+import (
+	"math/bits"
+
+	"github.com/mono0x/go-xoshiro/splitmix64"
+)
 
 // http://xoshiro.di.unimi.it/xoshiro256starstar.c
-
-func rtol(x uint64, k int) uint64 {
-	return (x << uint64(k)) | (x >> uint64(64-k))
-}
 
 type Source struct {
 	state [4]uint64
@@ -31,7 +31,7 @@ func (s *Source) Int63() int64 {
 }
 
 func (s *Source) Uint64() uint64 {
-	result := rtol(s.state[1]*5, 7) * 9
+	result := bits.RotateLeft64(s.state[1]*5, 7) * 9
 
 	t := s.state[1] << 17
 
@@ -42,7 +42,7 @@ func (s *Source) Uint64() uint64 {
 
 	s.state[2] ^= t
 
-	s.state[3] = rtol(s.state[3], 45)
+	s.state[3] = bits.RotateLeft64(s.state[3], 45)
 
 	return result
 }
